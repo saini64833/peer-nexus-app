@@ -4,21 +4,21 @@ import jwt from "jsonwebtoken";
 const userSchema = new mongoose.Schema(
   {
     fullName: { type: String, required: true },
-    username: { type: String, required: true, unique: true },
+    userName: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    avatar: { 
-      type: String, 
-      default: "https://your-default-image-url.com/avatar.png" 
+    avatar: {
+      type: String,
+      default: "https://your-default-image-url.com/avatar.png",
     },
-    status: { 
-      type: String, 
-      enum: ['online', 'offline', 'in-call'], 
-      default: 'offline' 
+    status: {
+      type: String,
+      enum: ["online", "offline", "in-call"],
+      default: "offline",
     },
     lastSeenAt: { type: Date, default: Date.now },
     stripeCustomerId: { type: String },
-    isPremium: { type: Boolean, default: false }
+    isPremium: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
@@ -27,12 +27,26 @@ const userSchema = new mongoose.Schema(
 userSchema.index({ username: 1 }, { unique: true });
 userSchema.index({ status: 1 });
 
-userSchema.pre("save",async function (next) {
-  if(!this.isModified("password")) return next();
-  this.password=await bcrypt.hash(this.password,10);
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 10);
   next();
-})
-userSchema.methods.isPasswordCorrect=async function (password) {
-  return await bcrypt.compare(password,this.password);
-}
+});
+userSchema.methods.isPasswordCorrect = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
+
+userSchema.methods.generateAcessToken = function () {
+  return jwt.sign(
+    {
+      email: this.email,
+      _id: this._id,
+      username: this.userName,
+    },
+    process.env.ACCESS_TOKEN_KEY,
+    {
+      expiresIn: process.env.ACCESS_+TOKEN_EXPIRY,
+    }
+  );
+};
 export default mongoose.model("User", userSchema);
