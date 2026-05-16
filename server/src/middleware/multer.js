@@ -2,9 +2,14 @@ import multer from "multer";
 import fs from "fs";
 import path from "path";
 
-const tempDir = path.join(process.cwd(), "public", "temp");
+const tempDir = path.join("./public/temp");
 
-if (!fs.existsSync(tempDir)) {
+// Clean up leftover temp files on server start
+if (fs.existsSync(tempDir)) {
+  fs.readdirSync(tempDir).forEach((file) => {
+    fs.unlinkSync(path.join(tempDir, file));
+  });
+} else {
   fs.mkdirSync(tempDir, { recursive: true });
 }
 
@@ -20,12 +25,11 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  const allowedMimeTypes = ["image/png", "image/jpeg"];
-
+  const allowedMimeTypes = ["image/png", "image/jpeg", "image/jpg"];
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Only PNG and JPEG images are allowed"), false);
+    cb(new Error("Unsupported file type"), false);
   }
 };
 
