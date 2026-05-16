@@ -42,6 +42,9 @@ Desktop.ini
 # MongoDB dumps or backups
 dump/
 *.bson
+# in server/.gitignore
+public/temp/*
+!public/temp/.gitkeep
 
 # Optional: lock files (choose one)
 # package-lock.json
