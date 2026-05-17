@@ -26,5 +26,7 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
 
 import authRoutes from "./routes/authRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/chats", chatRoutes);
 export {app};
