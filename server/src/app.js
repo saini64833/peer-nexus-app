@@ -8,7 +8,9 @@ app.use(
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
 
-      const allowedOrigins = process.env.CORS_ORIGIN;
+      const allowedOrigins = (process.env.CORS_ORIGIN || "")
+        .split(",")
+        .map((o) => o.trim());
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
@@ -27,6 +29,8 @@ app.use(cookieParser());
 
 import authRoutes from "./routes/authRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/chats", chatRoutes);
+app.use("/api/v1/chat", chatRoutes);
+app.use("/api/v1/payment", paymentRoutes);
 export {app};

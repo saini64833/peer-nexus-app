@@ -10,8 +10,8 @@ import jwt from "jsonwebtoken";
 // Cookie options
 const options = {
   httpOnly: true,
-  secure: true,
-  sameSite: "None",
+  secure: false,
+  sameSite: "lax",
 };
 
 // Generate access + refresh token

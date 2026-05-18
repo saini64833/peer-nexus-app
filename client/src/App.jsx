@@ -14,7 +14,7 @@ const OmegleCloneRoom = lazy(() => import("./pages/OmegleCloneRoom"));
 const Pricing         = lazy(() => import("./pages/Pricing"));
 const LoginForm       = lazy(() => import("./features/auth/LoginForm"));
 const RegisterForm    = lazy(() => import("./features/auth/RegisterForm"));
-
+const Files = lazy(() => import("./pages/FileDrop"));
 // ── Route guards ─────────────────────────────────────────────────────────────
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -122,7 +122,16 @@ function AppRoutes() {
             </Layout>
           </PrivateRoute>
         } />
-
+      <Route
+        path="/files"
+        element={
+          <PrivateRoute>
+          <Layout>
+          <Files />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
         {/* Premium only */}
         <Route path="/matchmaking" element={
           <PremiumRoute>

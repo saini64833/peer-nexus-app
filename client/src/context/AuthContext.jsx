@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useReducer, useCallback } from "react";
 import toast from "react-hot-toast";
-import { authApi } from "../services/api";
+import { authApi } from "../services/api.js";
 
 // ── State shape ───────────────────────────────────────────────────────────────
 // {
@@ -93,7 +93,8 @@ export function AuthProvider({ children }) {
     dispatch({ type: AUTH.SET_AUTH_LOADING, payload: true });
     const toastId = toast.loading("Signing you in…");
     try {
-      const { data } = await authApi.login(credentials);
+      await authApi.login(credentials);
+      const { data } = await authApi.getMe();
       dispatch({ type: AUTH.SET_USER, payload: data.data });
       toast.success(`Welcome back, ${data.data.fullName.split(" ")[0]}!`, { id: toastId });
       return { success: true };

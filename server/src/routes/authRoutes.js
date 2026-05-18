@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.post("/register", upload.single("avatar"), registerUser);
 router.get("/refresh", refreshAccessToken);
-router.post("/login", verifyJwt, loginUser);
+router.post("/login",  loginUser);
 router.post("/logout", verifyJwt, logOutUser);
 router.get("/me",verifyJwt,getCurrentUser);
 router.patch("/change-password",verifyJwt,changeCurrentPassword);

@@ -51,7 +51,7 @@ export function SocketProvider({ children }) {
 
     const socket = io(SOCKET_URL, {
       withCredentials: true,          // sends httpOnly cookies → server authenticates user
-      transports: ["websocket"],      // skip long-polling for lower latency
+      transports: ["websocket","polling"],      // skip long-polling for lower latency
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 2000,
