@@ -1,6 +1,7 @@
+import { Router } from "express";
 import express from "express";
 import { verifyJwt } from "../middleware/requireAuth.js";
-import { stripeWebhookParser } from "../middleware/stripeWebhookParser.js";
+// import { stripeWebhookParser } from "../middleware/stripeWebhookParser.js";
 import {
   createCheckoutSession,
   getSubscription,
@@ -8,15 +9,18 @@ import {
   handleWebhook,
 } from "../controllers/paymentController.js";
 
-const router = express.Router();
+const router = Router();
 
-// Stripe webhook — must use raw body parser, no auth
-router.post("/webhook", stripeWebhookParser, handleWebhook);
+/* webhook route FIRST */
+router.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  handleWebhook
+);
 
-// All other payment routes require auth
-router.use(verifyJwt);
-router.post("/checkout", createCheckoutSession);
-router.get("/subscription", getSubscription);
-router.post("/portal", getBillingPortal);
+/* protected routes */
+router.post("/checkout", verifyJwt, createCheckoutSession);
+router.get("/subscription", verifyJwt, getSubscription);
+router.post("/portal", verifyJwt, getBillingPortal);
 
 export default router;

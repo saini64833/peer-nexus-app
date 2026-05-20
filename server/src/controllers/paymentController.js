@@ -66,14 +66,12 @@ export const handleWebhook = asyncHandler(async (req, res) => {
   ensureStripe();
   const sig = req.headers["stripe-signature"];
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
-
   let event;
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, secret);
   } catch (err) {
     throw new ApiError(400, `Webhook signature verification failed: ${err.message}`);
   }
-
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object;
