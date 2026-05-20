@@ -16,24 +16,16 @@ const options = {
 
 // Generate access + refresh token
 const generateAccessAndRefreshToken = async (userId) => {
-  try {
-    const user = await User.findById(userId);
+  const user = await User.findById(userId);
 
-    const accessToken = user.generateAccessToken();
+  const accessToken = user.generateAccessToken();
+  const refreshToken = user.generateRefreshToken();
 
-    const refreshToken = user.generateRefreshToken();
+  user.refreshToken = refreshToken;
+  await user.save({ validateBeforeSave: false });
 
-    user.refreshToken = refreshToken;
-
-    await user.save({ validateBeforeSave: false });
-
-    return { accessToken, refreshToken };
-  } catch (error) {
-    console.error("Token generation error:", error.message);
-    throw new ApiError(500, "Something went wrong while generating tokens");
-  }
+  return { accessToken, refreshToken };
 };
-
 // Register User
 const registerUser = asyncHandler(async (req, res) => {
   const { password, fullName, userName, email } = req.body;
@@ -137,7 +129,6 @@ const loginUser = asyncHandler(async (req, res) => {
         200,
         {
           user: logedInUser,
-          refreshToken,
           accessToken,
         },
         "User logged in successfully!!"
@@ -172,42 +163,43 @@ const logOutUser = asyncHandler(async (req, res) => {
 const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken =
     req.cookies?.refreshToken || req.body?.refreshToken;
+
   if (!incomingRefreshToken) {
-    throw new ApiError(401, "refreshToken expired!!");
+    throw new ApiError(401, "No refresh token found");
   }
 
+  let decoded;
   try {
-    const decodedRefreshToken = jwt.verify(
+    decoded = jwt.verify(
       incomingRefreshToken,
       process.env.REFRESH_TOKEN_SECRET
     );
-    const user = await User.findById(decodedRefreshToken._id);
-    if (!user) {
-      throw new ApiError(401, "invalid refreshToken!!");
-    }
-    if (incomingRefreshToken !== user?.refreshToken) {
-      throw new ApiError(401, "refresh token expired or used");
-    }
-    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
-      user._id
-    );
-    return res
-      .status(200)
-      .cookie("refreshToken", refreshToken, options)
-      .cookie("accessToken", accessToken, options)
-      .json(
-        new ApiResponse(
-          200,
-          {
-            refreshToken: refreshToken,
-            accessToken,
-          },
-          "successfully refreshToken is refreshed"
-        )
-      );
-  } catch (error) {
-    throw new ApiError(401, error?.message || "refreshToken is invailid");
+  } catch (err) {
+    throw new ApiError(401, "Invalid or expired refresh token");
   }
+
+  const user = await User.findById(decoded._id);
+  if (!user) {
+    throw new ApiError(401, "User not found");
+  }
+
+  if (incomingRefreshToken !== user.refreshToken) {
+    throw new ApiError(401, "Refresh token mismatch (reuse detected)");
+  }
+
+  const accessToken = user.generateAccessToken();
+
+  //IMPORTANT: DO NOT rotate refresh token every time
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        { accessToken },
+        "Access token refreshed successfully"
+      )
+    );
 });
 
 const changeCurrentPassword = asyncHandler(async (req, res) => {
@@ -232,5 +224,5 @@ export {
   logOutUser,
   refreshAccessToken,
   getCurrentUser,
-  changeCurrentPassword
+  changeCurrentPassword,
 };
