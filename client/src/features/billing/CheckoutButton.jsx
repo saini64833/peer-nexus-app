@@ -8,7 +8,8 @@ import toast from "react-hot-toast";
  */
 export default function CheckoutButton({ priceId, label = "Upgrade", highlighted = false }) {
   const [loading, setLoading] = useState(false);
-
+  console.log("clicked");
+      console.log("PRICE ID:", priceId);
   const handleClick = async () => {
     if (!priceId) return;
     setLoading(true);

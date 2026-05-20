@@ -1,7 +1,7 @@
 import PricingTierCard from "../features/billing/PricingTierCard";
 import CheckoutButton from "../features/billing/CheckoutButton";
 import { useAuth } from "../context/AuthContext";
-
+import { paymentApi } from "../services/api";
 const TIERS = [
   {
     name: "Free",
@@ -20,7 +20,7 @@ const TIERS = [
   },
   {
     name: "Premium",
-    price: "$9",
+    price: "$12",
     period: "/month",
     description: "Unlock video matchmaking and all advanced features.",
     features: [
@@ -78,7 +78,25 @@ export default function Pricing() {
             <PricingTierCard
               key={tier.name}
               {...tier}
-              onCta={!tier.priceId ? undefined : undefined}
+              onCta={async () => {
+              if (!tier.priceId) return;
+
+             try {
+                const response =
+                await paymentApi.createCheckoutSession(
+                  tier.priceId
+                );
+
+              const url = response?.data?.url;
+
+              if (url) {
+              window.location.href = url;
+              }
+            } catch (err) {
+             console.error(err);
+              alert("Checkout failed");
+          }
+          }}
               ctaLabel={
                 tier.name === "Free"
                   ? user ? "Current Free Plan" : "Get Started Free"

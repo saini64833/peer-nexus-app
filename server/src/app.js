@@ -1,6 +1,11 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+
+import authRoutes from "./routes/authRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+
 const app = express();
 
 app.use(
@@ -15,7 +20,7 @@ app.use(
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-      
+
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
@@ -23,14 +28,15 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+app.use("/api/v1/payment", paymentRoutes);
+
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
+
 app.use(cookieParser());
 
-import authRoutes from "./routes/authRoutes.js";
-import chatRoutes from "./routes/chatRoutes.js";
-import paymentRoutes from "./routes/paymentRoutes.js";
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/chat", chatRoutes);
-app.use("/api/v1/payment", paymentRoutes);
-export {app};
+
+export { app };
