@@ -10,7 +10,7 @@ import jwt from "jsonwebtoken";
 // Cookie options
 const options = {
   httpOnly: true,
-  secure: false,
+  secure: true,
   sameSite: "lax",
 };
 

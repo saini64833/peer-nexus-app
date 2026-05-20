@@ -1,7 +1,8 @@
 import PricingTierCard from "../features/billing/PricingTierCard";
-import CheckoutButton from "../features/billing/CheckoutButton";
 import { useAuth } from "../context/AuthContext";
 import { paymentApi } from "../services/api";
+import toast from "react-hot-toast";
+
 const TIERS = [
   {
     name: "Free",
@@ -32,7 +33,9 @@ const TIERS = [
     ],
     ctaLabel: "Upgrade to Pro",
     highlighted: true,
-    priceId: import.meta.env.VITE_STRIPE_PRICE_ID ?? "price_placeholder",
+    priceId:
+      import.meta.env.VITE_STRIPE_PRICE_ID ??
+      "price_placeholder",
   },
 ];
 
@@ -40,78 +43,132 @@ export default function Pricing() {
   const { user } = useAuth();
 
   return (
-    <div style={{
-      minHeight: "calc(100vh - 60px)",
-      background: "#0a0a0f",
-      display: "flex", flexDirection: "column", alignItems: "center",
-      padding: "4rem 1.5rem",
-      fontFamily: "'DM Sans', sans-serif",
-    }}>
-      <div style={{ maxWidth: 780, width: "100%", textAlign: "center" }}>
-        <div style={{
-          display: "inline-block",
-          background: "rgba(110,231,247,0.08)", border: "1px solid rgba(110,231,247,0.2)",
-          borderRadius: "999px", padding: "0.3rem 1rem",
-          fontSize: "0.75rem", fontWeight: 600, color: "#6ee7f7",
-          letterSpacing: "0.06em", textTransform: "uppercase",
-          marginBottom: "1.25rem",
-        }}>Pricing</div>
+    <div
+      style={{
+        minHeight: "calc(100vh - 60px)",
+        background: "#0a0a0f",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "4rem 1.5rem",
+        fontFamily: "'DM Sans', sans-serif",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 780,
+          width: "100%",
+          textAlign: "center",
+        }}
+      >
+        <div
+          style={{
+            display: "inline-block",
+            background: "rgba(110,231,247,0.08)",
+            border:
+              "1px solid rgba(110,231,247,0.2)",
+            borderRadius: "999px",
+            padding: "0.3rem 1rem",
+            fontSize: "0.75rem",
+            fontWeight: 600,
+            color: "#6ee7f7",
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+            marginBottom: "1.25rem",
+          }}
+        >
+          Pricing
+        </div>
 
-        <h1 style={{
-          fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 800,
-          color: "#f1f5f9", letterSpacing: "-0.04em",
-          marginBottom: "1rem", lineHeight: 1.1,
-        }}>
+        <h1
+          style={{
+            fontSize: "clamp(2rem, 5vw, 3rem)",
+            fontWeight: 800,
+            color: "#f1f5f9",
+            letterSpacing: "-0.04em",
+            marginBottom: "1rem",
+            lineHeight: 1.1,
+          }}
+        >
           Simple, transparent pricing
         </h1>
-        <p style={{ color: "#64748b", fontSize: "1.05rem", marginBottom: "3.5rem", maxWidth: 480, margin: "0 auto 3.5rem" }}>
-          Start free and upgrade when you need the full experience.
+
+        <p
+          style={{
+            color: "#64748b",
+            fontSize: "1.05rem",
+            marginBottom: "3.5rem",
+            maxWidth: 480,
+            margin: "0 auto 3.5rem",
+          }}
+        >
+          Start free and upgrade when you need
+          the full experience.
         </p>
 
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: "1.5rem",
-          alignItems: "start",
-        }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: "1.5rem",
+            alignItems: "start",
+          }}
+        >
           {TIERS.map((tier) => (
             <PricingTierCard
               key={tier.name}
               {...tier}
-              onCta={async () => {
-              if (!tier.priceId) return;
-
-             try {
-                const response =
-                await paymentApi.createCheckoutSession(
-                  tier.priceId
-                );
-
-              const url = response?.data?.url;
-
-              if (url) {
-              window.location.href = url;
-              }
-            } catch (err) {
-             console.error(err);
-              alert("Checkout failed");
-          }
-          }}
+              
               ctaLabel={
                 tier.name === "Free"
-                  ? user ? "Current Free Plan" : "Get Started Free"
-                  : user?.isPremium ? "Already Premium ✓" : tier.ctaLabel
+                  ? user
+                    ? "Current Free Plan"
+                    : "Get Started Free"
+                  : user?.isPremium
+                  ? "Already Premium ✓"
+                  : tier.ctaLabel
               }
-            >
-              {tier.priceId && !user?.isPremium && (
-                <CheckoutButton priceId={tier.priceId} label={tier.ctaLabel} highlighted />
-              )}
-            </PricingTierCard>
+              onCta={async () => {
+                if (!tier.priceId) return;
+
+                try {
+                  console.log("checkout clicked");
+                  const response =
+                    await paymentApi.createCheckoutSession(
+                      tier.priceId
+                    );
+
+                  console.log(response.data.data);
+
+                  const url =
+                    response?.data?.data?.url;
+
+                  if (url) {
+                    window.location.href = url;
+                  } else {
+                    toast.error(
+                      "No checkout URL returned"
+                    );
+                  }
+                } catch (err) {
+                  console.error(err);
+                  toast.error("Checkout failed");
+                }
+              }}
+            />
           ))}
         </div>
 
-        <p style={{ color: "#334155", fontSize: "0.8rem", marginTop: "3rem" }}>
-          Prices in USD. Cancel anytime. Powered by Stripe.
+        <p
+          style={{
+            color: "#334155",
+            fontSize: "0.8rem",
+            marginTop: "3rem",
+          }}
+        >
+          Prices in USD. Cancel anytime.
+          Powered by Stripe.
         </p>
       </div>
     </div>
