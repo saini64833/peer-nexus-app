@@ -117,28 +117,51 @@
   };
 
   // ── Chat / messaging endpoints ────────────────────────────────────────────────
-  export const chatApi = {
-    /** Get all conversations for the current user. */
-    getConversations: () => api.get("/chat/conversations"),
+export const chatApi = {
+  /** Get all conversations for the current user. */
+  getConversations: () => api.get("/chat/conversations"),
 
-    /** Get or create a conversation with a specific user. */
-    getOrCreateConversation: (userId) =>
-      api.post("/chat/conversations", { participantId: userId }),
+  /** Get or create a conversation with a specific user. */
+  getOrCreateConversation: (userId) =>
+    api.post("/chat/conversations", { participantId: userId }),
 
-    /** Get messages for a conversation. Supports pagination via `page`. */
-    getMessages: (conversationId, page = 1) =>
-      api.get(`/chat/conversations/${conversationId}/messages`, {
-        params: { page, limit: 30 },
-      }),
+  /** Get messages for a conversation. Supports pagination via `page`. */
+  getMessages: (conversationId, page = 1) =>
+    api.get(`/chat/conversations/${conversationId}/messages`, {
+      params: { page, limit: 30 },
+    }),
 
-    /** Send a message in a conversation. */
-    sendMessage: (conversationId, content) =>
-      api.post(`/chat/conversations/${conversationId}/messages`, { content }),
+  /** Send a text message. */
+  sendMessage: (conversationId, content) =>
+    api.post(`/chat/conversations/${conversationId}/messages`, {
+      content,
+    }),
 
-    /** Search registered users by userName or email. */
-    searchUsers: (query) =>
-      api.get("/chat/users/search", { params: { q: query } }),
-  };
+  /** Send image message */
+  sendImageMessage: (conversationId, formData) =>
+    api.post(
+      `/chat/conversations/${conversationId}/messages/image`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    ),
+
+  /** Send file metadata for WebRTC transfer */
+  sendFileMetadata: (conversationId, data) =>
+    api.post(
+      `/chat/conversations/${conversationId}/messages/file`,
+      data
+    ),
+
+  /** Search users */
+  searchUsers: (query) =>
+    api.get("/chat/users/search", {
+      params: { q: query },
+    }),
+};
 
   // ── Payment / billing endpoints ───────────────────────────────────────────────
   export const paymentApi = {
