@@ -414,7 +414,14 @@ export default function Dashboard() {
                       key={u._id}
                       contact={u}
                       isOnline={onlineUsers.includes(u._id)}
-                      onClick={() => { toast.success(`Opening chat with ${u.fullName}`); navigate("/messages"); }}
+                      onClick={async () => {
+                        try {
+                         await chatApi.getOrCreateConversation(u._id);
+                         navigate("/messages");
+                       }catch {
+                         toast.error("Could not open conversation");
+                       }
+                      }}
                     />
                   ))}
                 </div>

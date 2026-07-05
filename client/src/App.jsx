@@ -14,6 +14,8 @@ const OmegleCloneRoom = lazy(() => import("./pages/OmegleCloneRoom"));
 const Pricing         = lazy(() => import("./pages/Pricing"));
 const LoginForm       = lazy(() => import("./features/auth/LoginForm"));
 const RegisterForm    = lazy(() => import("./features/auth/RegisterForm"));
+const MessageBubble   = lazy(()=>import("./pages/MessageBubble"));
+const ChatWindow      = lazy(()=>import("./pages/chatWindow"));
 const Files = lazy(() => import("./pages/FileDrop"));
 // ── Route guards ─────────────────────────────────────────────────────────────
 const PrivateRoute = ({ children }) => {
