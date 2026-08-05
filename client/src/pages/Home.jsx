@@ -330,17 +330,6 @@ export default function Home() {
           <div style={{ width: 1, height: 48, background: "linear-gradient(to bottom, transparent, #6ee7f7)", margin: "0 auto" }} />
         </div>
       </section>
-
-      {/* Stats */}
-      <section style={{ borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 2rem", display: "grid", gridTemplateColumns: "repeat(4,1fr)" }}>
-          <StatCard value={50000} suffix="+" label="Active Users" color="#6ee7f7" />
-          <StatCard value={2} suffix="ms" label="Avg Latency" color="#a78bfa" />
-          <StatCard value={99} suffix="%" label="Uptime SLA" color="#f472b6" />
-          <StatCard value={1} suffix="B+" label="Files Transferred" color="#34d399" />
-        </div>
-      </section>
-
       {/* Features */}
       <section style={{ maxWidth: 1100, margin: "0 auto", padding: "6rem 2rem" }}>
         <div ref={featRef} style={{ textAlign: "center", marginBottom: "3.5rem", opacity: featVisible ? 1 : 0, transform: featVisible ? "none" : "translateY(24px)", transition: "all 0.6s" }}>
