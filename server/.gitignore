@@ -1,7 +1,3 @@
-# =========================================
-# Node.js Backend - RuralLearn
-# =========================================
-
 # Environment files
 .env
 .env.local

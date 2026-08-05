@@ -403,9 +403,6 @@ export default function Home() {
           <h2 style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 900, color: "#f8fafc", letterSpacing: "-0.04em", marginBottom: "1rem" }}>
             Ready to go peer-to-peer?
           </h2>
-          <p style={{ color: "#64748b", fontSize: "1rem", marginBottom: "2rem" }}>
-            Join 50,000+ users already on the network. Free forever.
-          </p>
           <Link to="/register" style={{
             display: "inline-block",
             padding: "1rem 2.5rem", borderRadius: "1rem",
